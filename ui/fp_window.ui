@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>900</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>900</width>
+    <height>16777215</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#frame_2 {
+	background-color: #636e72;
+}</string>
+  </property>
+  <widget class="QFrame" name="frame_2">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>0</y>
+     <width>600</width>
+     <height>650</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>600</width>
+     <height>650</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>600</width>
+     <height>650</height>
+    </size>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>300</width>
+     <height>650</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>300</width>
+     <height>650</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>300</width>
+     <height>650</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QFrame {
+	background-color: #2d3436;
+}
+
+QLabel {
+	color: rgb(255, 255, 255);
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>-40</y>
+      <width>301</width>
+      <height>281</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>20</number>
+     </property>
+     <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="verticalSpacing">
+        <number>10</number>
+       </property>
+       <item row="1" column="0" alignment="Qt::AlignHCenter">
+        <widget class="QLabel" name="label">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Cota Z</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QComboBox" name="comboBox">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="horizontalSpacing">
+        <number>20</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>10</number>
+       </property>
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Mid Case (75%)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Mid Case (25%)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Mid Case (50%)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QRadioButton" name="radioButton">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QRadioButton" name="radioButton_3">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QRadioButton" name="radioButton_2">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QRadioButton" name="radioButton_4">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QRadioButton" name="radioButton_5">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Worst Case</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_2">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>Best Case</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" rowspan="5">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="3" rowspan="5">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QPushButton" name="pushButton">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Actualizar</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
