@@ -1351,9 +1351,9 @@ QPushButton {
      <property name="geometry">
       <rect>
        <x>55</x>
-       <y>171</y>
+       <y>121</y>
        <width>711</width>
-       <height>531</height>
+       <height>631</height>
       </rect>
      </property>
     </widget>
