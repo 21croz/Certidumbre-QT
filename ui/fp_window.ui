@@ -181,7 +181,7 @@ QLabel {
          </widget>
         </item>
         <item alignment="Qt::AlignHCenter">
-         <widget class="QComboBox" name="comboBox_2">
+         <widget class="QComboBox" name="combo_cota">
           <property name="minimumSize">
            <size>
             <width>100</width>
