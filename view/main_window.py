@@ -4,6 +4,7 @@ import os
 
 from PyQt6 import QtWidgets, uic, QtGui                                                     # Paquetes parte de PyQt6 que ayudan a facilitar la ejecución del código
 from PyQt6.QtWidgets import QFileDialog, QMessageBox, QGraphicsScene                        # Paquetes parte de PyQt6 > QtWidgets que ayudan a 
+from PyQt6.QtCore import QCoreApplication
 from matplotlib.figure import Figure                                                        # 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas            # 
 from mpl_toolkits.mplot3d import Axes3D                                                     # 
@@ -98,6 +99,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Esta función liga los botones a las funciones correspondientes.
         """
         self.menubar_file_openfile.triggered.connect(self.open_file)
+        self.menubar_file_quit.triggered.connect(self.quit_app)
         self.menubar_view_fp.triggered.connect(self.create_footprint_window)
         
         self.button_3d_plot.clicked.connect(self.create_3d_plot)
@@ -126,10 +128,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     "Archivo cargado",
                     f"El archivo {file_path} se cargó correctamente.\n"
                     f"El archivo contiene {self.loaded_dataframe.shape[0]} filas y {self.loaded_dataframe.shape[1]} columnas.")
+                self.modify_combobox()
             except Exception:
                 QMessageBox.critical(self, "Error", f"No se pudo cargar el archivo {file_path}.")
         
-        self.modify_combobox()
         return
 
 
@@ -425,7 +427,8 @@ class MainWindow(QtWidgets.QMainWindow):
         total_files, total_folder_size = self.iterations_result_files()
         total_folder_size *= (1024*1024)
         aprox_file_size = 1200
-        progress_index = 1
+        iteration_number = 0
+        
         saved_data = {
                 "x": self.loaded_dataframe[self.x_coordinate],
                 "y": self.loaded_dataframe[self.y_coordinate],
@@ -436,6 +439,7 @@ class MainWindow(QtWidgets.QMainWindow):
             }
 
         for price, m_cost, p_cost, discount, recov, sell_c in combinations:
+            iteration_number += 1
             
             df_saved = pd.DataFrame(saved_data)
             volume = 1000
@@ -463,7 +467,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 case = ""
             
             self.save_file(df_saved, file_name, normal = True)
+
+            QCoreApplication.processEvents()
+            progress_index = int((iteration_number/total_files)*100)
+            self.progress_bar.setValue(progress_index)
         
+        self.progress_bar.setValue(100)
         self.finish_iterations()
         return
     
@@ -735,6 +744,9 @@ class MainWindow(QtWidgets.QMainWindow):
     
 
     def finish_iterations(self):
+        """
+        Esta funcion establece las acciones que se llevarán a cabo una vez termine de ejecutarse el loop de las iteraciones.
+        """
         QMessageBox.information(
             self,
             "Completado",
@@ -742,4 +754,13 @@ class MainWindow(QtWidgets.QMainWindow):
             QMessageBox.StandardButton.Ok
         )
         self.button_iterate.setEnabled(True)
+        self.progress_bar.setValue(0)
+        return
+
+
+    def quit_app(self):
+        """
+        Esta función cierra la aplicación´.
+        """
+        self.close()
         return
