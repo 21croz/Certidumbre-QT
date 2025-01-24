@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
+    <width>1000</width>
     <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>900</width>
+    <width>1000</width>
     <height>600</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>900</width>
+    <width>1000</width>
     <height>16777215</height>
    </size>
   </property>
@@ -61,7 +61,7 @@ QLabel {
     <rect>
      <x>300</x>
      <y>10</y>
-     <width>591</width>
+     <width>691</width>
      <height>581</height>
     </rect>
    </property>
@@ -73,7 +73,7 @@ QLabel {
    </property>
    <property name="maximumSize">
     <size>
-     <width>600</width>
+     <width>1000</width>
      <height>600</height>
     </size>
    </property>
@@ -88,7 +88,7 @@ QLabel {
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>551</width>
+      <width>651</width>
       <height>541</height>
      </rect>
     </property>

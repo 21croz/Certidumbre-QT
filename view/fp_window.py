@@ -1,8 +1,8 @@
-import os
-import pandas as pd
+import os                                                                                   # 
+import pandas as pd                                                                         # 
 import matplotlib.pyplot as plt                                                             # Importa la librería de graficación.
 
-from PyQt6 import QtWidgets, uic
+from PyQt6 import QtWidgets, uic                                                            # 
 from PyQt6.QtWidgets import QFileDialog, QMessageBox, QGraphicsScene                        # Paquetes parte de PyQt6 > QtWidgets que ayudan a 
 from matplotlib.figure import Figure                                                        # 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas            # 
@@ -135,6 +135,12 @@ class FootprintWindow(QtWidgets.QDialog):
         """
         self.define_coordinates()
 
+        self.graphicsView.setScene(None)
+
+        self.fig = Figure()
+        self.canvas = FigureCanvas(self.fig)
+        self.ax = self.fig.add_subplot(111)
+
         self.ax.clear()
 
         for i, show in enumerate(self.states):
@@ -152,10 +158,10 @@ class FootprintWindow(QtWidgets.QDialog):
         self.ax.set_xlabel("X")
         self.ax.set_ylabel("Y")
 
-        escena = QGraphicsScene()
-        escena.addWidget(self.canvas)
+        self.escena = QGraphicsScene()
+        self.escena.addWidget(self.canvas)
 
-        self.graphicsView.setScene(escena)
+        self.graphicsView.setScene(self.escena)
         return
     
 
