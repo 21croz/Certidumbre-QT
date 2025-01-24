@@ -454,7 +454,7 @@ class MainWindow(QtWidgets.QMainWindow):
             df_saved["disc_value"] = df_saved["value"]/((1 + discount/100) ** df_saved["period"])
             df_saved = self.set_antes_max(df_saved)
 
-            file_name = f'p{price}mc{m_cost}pc{p_cost}d{discount}r{recov}sc{sell_c}.csv'
+            file_name = f'p{round(price, 1)}mc{round(m_cost, 1)}pc{round(p_cost, 1)}d{round(discount, 1)}r{round(recov, 1)}sc{round(sell_c, 1)}.csv'
 
             case = self.set_study_case(parameters_ranges, price, m_cost, p_cost, discount, recov, sell_c)
 
@@ -670,7 +670,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return
 
 
-    def set_antes_max(self):
+    def set_antes_max(self, df):
         """
         Esta funcion modifica la columna 'antes_max' del dataframe.
         * Se hace un filtro en cada elemento, se agrupan los que tienen igual coordenada (x, y), de esta forma se aisla cada columna.
