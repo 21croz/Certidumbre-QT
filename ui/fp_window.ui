@@ -44,7 +44,6 @@ QLabel {
 }
 
 #button_guardar {
-	all:unset;
 	background-color: rgb(45, 200, 130);
 	color: rgb(255, 255, 255);
 	font-weight: bold;
@@ -84,6 +83,16 @@ QLabel {
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
+   <widget class="QGraphicsView" name="graphicsView">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>551</width>
+      <height>541</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QFrame" name="frame">
    <property name="geometry">
@@ -125,8 +134,7 @@ QLabel {
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">
-</string>
+     <string notr="true"/>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
@@ -331,35 +339,35 @@ QLabel {
          </spacer>
         </item>
         <item row="0" column="1">
-         <widget class="QCheckBox" name="checkBox">
+         <widget class="QCheckBox" name="check_best">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QCheckBox" name="checkBox_2">
+         <widget class="QCheckBox" name="check_mid75">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QCheckBox" name="checkBox_3">
+         <widget class="QCheckBox" name="check_mid50">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QCheckBox" name="checkBox_4">
+         <widget class="QCheckBox" name="check_mid25">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QCheckBox" name="checkBox_5">
+         <widget class="QCheckBox" name="check_worst">
           <property name="text">
            <string/>
           </property>

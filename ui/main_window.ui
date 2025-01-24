@@ -31,7 +31,6 @@
 
 QLabel {
 	font-family: MS Shell Dlg 2;
-	font-size: 13px
 }
 
 QLineEdit {
@@ -64,7 +63,7 @@ QPushButton {
 	font-weight: bold;
 	padding: 5px 10px;
 } QPushButton:hover {
-	background-color: #45bf9c;
+	background-color: #219460;
 } QPushButton:pressed {
 	background-color: #b6f2e1;
 } QPushButton:!enabled {
@@ -150,7 +149,7 @@ QPushButton {
          <property name="font">
           <font>
            <family>MS Shell Dlg 2</family>
-           <pointsize>-1</pointsize>
+           <pointsize>9</pointsize>
           </font>
          </property>
          <property name="styleSheet">
@@ -194,6 +193,12 @@ QPushButton {
            <height>16</height>
           </size>
          </property>
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Y Coordinate</string>
          </property>
@@ -232,6 +237,12 @@ QPushButton {
            <height>16</height>
           </size>
          </property>
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>Z Coordinate</string>
          </property>
@@ -269,6 +280,12 @@ QPushButton {
            <width>16777215</width>
            <height>16</height>
           </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+           <pointsize>9</pointsize>
+          </font>
          </property>
          <property name="text">
           <string>Metal grade</string>
@@ -533,6 +550,12 @@ QPushButton {
              <height>20</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="lineWidth">
             <number>1</number>
            </property>
@@ -557,6 +580,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Max</string>
@@ -624,6 +653,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Min</string>
            </property>
@@ -664,6 +699,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Paso</string>
@@ -710,6 +751,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Min</string>
            </property>
@@ -731,6 +778,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Paso</string>
@@ -811,6 +864,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Max</string>
            </property>
@@ -832,6 +891,12 @@ QPushButton {
              <width>16777215</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Costo Mina [USD/t]</string>
@@ -877,6 +942,12 @@ QPushButton {
              <width>16777215</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Costo Planta [USD/t]</string>
@@ -944,6 +1015,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Min</string>
            </property>
@@ -965,6 +1042,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Paso</string>
@@ -1006,6 +1089,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Max</string>
@@ -1052,6 +1141,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Paso</string>
            </property>
@@ -1074,6 +1169,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Max</string>
            </property>
@@ -1095,6 +1196,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Min</string>
@@ -1136,6 +1243,12 @@ QPushButton {
              <width>16777215</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Recuperación [%]</string>
@@ -1226,6 +1339,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Max</string>
            </property>
@@ -1266,6 +1385,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Min</string>
@@ -1314,6 +1439,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Paso</string>
            </property>
@@ -1354,6 +1485,12 @@ QPushButton {
              <width>16777215</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Tasa de Descuento [%]</string>
@@ -1400,6 +1537,12 @@ QPushButton {
              <height>15</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Min</string>
            </property>
@@ -1422,6 +1565,12 @@ QPushButton {
              <height>20</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Costo de Venta [USD/lb]</string>
            </property>
@@ -1443,6 +1592,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Paso</string>
@@ -1503,6 +1658,12 @@ QPushButton {
              <width>16777215</width>
              <height>15</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>9</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Max</string>
