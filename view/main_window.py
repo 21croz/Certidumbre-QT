@@ -31,8 +31,75 @@ class MainWindow(QtWidgets.QMainWindow):
         self.define_widgets_variables()
 
         self.define_actions()
+
+        self.load_entries()
         return
     
+
+    def closeEvent(self, event):
+        """
+        Esta función define el comportamiento del botón de cerrar la ventana.
+        """
+        message_box = QMessageBox(self)
+        message_box.setWindowTitle("Salir")
+        message_box.setText("¿Deseas guardar los cambios antes de salir?")
+        message_box.setIcon(QMessageBox.Icon.Question)
+
+        save_button = message_box.addButton("Guardar", QMessageBox.ButtonRole.AcceptRole)
+        cancel_button = message_box.addButton("Cancelar", QMessageBox.ButtonRole.RejectRole)
+        dont_save_button = message_box.addButton("No Guardar", QMessageBox.ButtonRole.DestructiveRole)
+
+        message_box.exec()
+
+        if message_box.clickedButton() == save_button:
+            self.button_save()
+            event.accept()
+
+        elif message_box.clickedButton() == cancel_button:
+            event.ignore()
+
+        elif message_box.clickedButton() == dont_save_button:
+            event.accept()
+
+
+    def button_save(self):
+        """
+        Esta función define el comportamiento del botón 'guardar' al cerrar la ventana.
+        """
+        path = r"reports"
+        file_name = "saved_data.txt"
+
+        entries = [
+            self.entry_price_min.text(),
+            self.entry_price_max.text(),
+            self.entry_price_step.text(),
+        
+            self.entry_mcost_min.text(),
+            self.entry_mcost_max.text(),
+            self.entry_mcost_step.text(),
+        
+            self.entry_pcost_min.text(),
+            self.entry_pcost_max.text(),
+            self.entry_pcost_step.text(),
+        
+            self.entry_recovery_min.text(),
+            self.entry_recovery_max.text(),
+            self.entry_recovery_step.text(),
+        
+            self.entry_discount_min.text(),
+            self.entry_discount_max.text(),
+            self.entry_discount_step.text(),
+        
+            self.entry_scost_min.text(),
+            self.entry_scost_max.text(),
+            self.entry_scost_step.text()]
+
+        with open(os.path.join(path, file_name), "w", encoding = "utf-8") as archivo:
+            for i, item in enumerate(entries):
+                archivo.write(f"{i}, {str(item)}\n")
+
+        return
+
 
     def create_control_variables(self):
         """
@@ -162,6 +229,65 @@ class MainWindow(QtWidgets.QMainWindow):
         return
     
 
+    def load_entries(self):
+        """
+        Esta función carga los datos de los entries guardados en el archivo 'saved_data.txt'.
+        """
+        if not os.path.exists(os.path.join("reports", "saved_data.txt")):
+            return
+        
+        list_line_edits = [
+            self.entry_price_min,
+            self.entry_price_max,
+            self.entry_price_step,
+            self.entry_mcost_min,
+            self.entry_mcost_max,
+            self.entry_mcost_step,
+            self.entry_pcost_min,
+            self.entry_pcost_max,
+            self.entry_pcost_step,
+            self.entry_recovery_min,
+            self.entry_recovery_max,
+            self.entry_recovery_step,
+            self.entry_discount_min,
+            self.entry_discount_max,
+            self.entry_discount_step,
+            self.entry_scost_min,
+            self.entry_scost_max,
+            self.entry_scost_step,
+        ]
+        
+        with open(os.path.join("reports", "saved_data.txt"), "r") as archivo:
+            for line in archivo:
+                save_line = self.split_string(line)
+
+                if save_line != None:
+                    list_line_edits[int(save_line[0])].setText(str(save_line[1]))
+                else:
+                    continue
+
+        return
+
+
+    def split_string(self, text: str, delim = ","):
+        """
+        """
+        string1 = ""
+        string2 = ""
+        
+        for i, a in enumerate(text):
+            if a == delim:
+                string1 = text[0:i]
+                string2 = text[i+2:len(text)]
+
+        try:
+            string1 = float(string1)
+            string2 = float(string2)
+            return string1, string2
+        except Exception:
+            return
+
+
     def delete_plot(self):
         """
         Esta función elimina el gráfico ya existente en el graphicsView de la parte derecha de la interfaz.
@@ -254,11 +380,8 @@ class MainWindow(QtWidgets.QMainWindow):
         Esta función inicia el proceso de las iteraciones.
         """
         if self.alert_message_iterations():
-            print("Ok")
             self.button_iterate.setEnabled(False)
-            self.iterations()
-        else:
-            print("Nao Nao")
+            self.iterations(test = False)
         
         return
     
@@ -280,7 +403,7 @@ class MainWindow(QtWidgets.QMainWindow):
             string_files_size = f'{(file_size/1024):,.2f}'.replace(',', '.')
             string_files_size += ' Tb'
         
-        iterate_time = self.convert_time(file_number*0.25)
+        iterate_time = self.convert_time(self.iterations(test = True)*file_number)
 
         mensaje = QMessageBox(self)
         mensaje.setWindowTitle("Confirmación")
@@ -335,9 +458,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         >>> self.define_list(5, 5, 1)
         [5]
+
+        >>> self.define_list(6, 3, 1)
+        [3, 4, 5, 6]
         """
         if min == max:
             return [min]
+        elif min > max:
+            return np.arange(max, min + step, step)
         else:
             return np.arange(min, max + step, step)
 
@@ -407,7 +535,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return string_time
 
 
-    def iterations(self):
+    def iterations(self, test: bool = False):
         """
         Proceso de iteraciones para el análisis de sensibilidad.
         """
@@ -439,6 +567,7 @@ class MainWindow(QtWidgets.QMainWindow):
             }
 
         for price, m_cost, p_cost, discount, recov, sell_c in combinations:
+            t1 = time()
             iteration_number += 1
             
             df_saved = pd.DataFrame(saved_data)
@@ -465,6 +594,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if case != '':
                 self.save_file(df_saved, f"{case}.csv", normal = False)
                 case = ""
+
+            if test == True:
+                self.save_file(df_saved, "test.csv", test = True)
+                return time() - t1
             
             self.save_file(df_saved, file_name, normal = True)
 
@@ -496,10 +629,11 @@ class MainWindow(QtWidgets.QMainWindow):
             os.makedirs(path_cases)
         else:
             self.clear_files(path_cases)
+
         return
     
 
-    def clear_files(self, path):
+    def clear_files(self, path: str):
         """
         Elimina los archivos dentro de una carpeta.
         
@@ -713,7 +847,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return pd.concat(column_dataframes, ignore_index = True)
     
 
-    def save_file(self, df, name:str, normal = True):
+    def save_file(self, df, name:str, normal = True, test = False):
         """
         Esta función guarda los dataframes creados en la carpeta iterations y cases dentro de la carpeta data.
         
@@ -725,6 +859,16 @@ class MainWindow(QtWidgets.QMainWindow):
         Outputs:
         * Se crea un archivo dentro de una de las carpetas iterations o cases (dependiendo del parámetro normal).
         """
+        if test:
+            path = os.path.join("reports")
+            if not os.path.exists(path):
+                os.makedirs(path)
+            
+            file_path = os.path.join(path, name)
+            df.to_csv(file_path, index = False)
+            return
+
+
         if normal:
             path = os.path.join("reports", "iteraciones")
             if not os.path.exists(path):
