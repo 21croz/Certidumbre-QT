@@ -1,17 +1,18 @@
 import pandas as pd                                                                         # Paquete de ayuda para cargar y leer archivos .csv.
 import numpy as np                                                                          # Paquete de ayuda para operaciones matemáticas.
-import os
+import os                                                                                   # Paquete para inspeccionar archivos en distintos directorios.
 
-from PyQt6 import QtWidgets, uic, QtGui                                                     # Paquetes parte de PyQt6 que ayudan a facilitar la ejecución del código
-from PyQt6.QtWidgets import QFileDialog, QMessageBox, QGraphicsScene                        # Paquetes parte de PyQt6 > QtWidgets que ayudan a 
-from PyQt6.QtCore import QCoreApplication
-from matplotlib.figure import Figure                                                        # 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas            # 
-from mpl_toolkits.mplot3d import Axes3D                                                     # 
-from itertools import product                                                               # 
-from time import time                                                                       # 
+from PyQt6 import QtWidgets, uic, QtGui                                                     # Paquetes parte de PyQt6 que ayudan a facilitar la ejecución del código.
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, QGraphicsScene                        # Paquetes parte de PyQt6 > QtWidgets que facilitan la sintaxis del código.
+from PyQt6.QtCore import QCoreApplication                                                   # Permite actualizar la interfaz para hacer que la barra de progreso sea dinámica.
+from PyQt6.QtCore import QThread, pyqtSignal                                                # Permite trabajar en la interfaz usando diferentes hilos del procesador.
+from matplotlib.figure import Figure                                                        # Permite hacer gráficos.
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas            # Permite poner en la interfaz los gráficos creados.
+from itertools import product                                                               # Paquete parte de itertools. Permite hacer combinaciones entre los elementos de una lista.
+from time import time                                                                       # Permite calcular el tiempo de ejecución de ciertas líneas de código.
 
-from view.fp_window import FootprintWindow                                                  
+from view.fp_window import FootprintWindow                                                  # Importe de la clase de la ventana ubicada en, View / Footprint Window.
+from view.iteration_thread import WorkerThread                                              # Importe de la clase del hilo para hacer las iteraciones.
 
 
 
@@ -34,7 +35,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.load_entries()
         return
-    
+
 
     def closeEvent(self, event):
         """
@@ -154,6 +155,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.button_fp_plot = self.findChild(QtWidgets.QPushButton, "button_foot_plot")
 
         self.button_iterate = self.findChild(QtWidgets.QPushButton, "button_iterate")
+        self.button_stop = self.findChild(QtWidgets.QPushButton, "button_stop")
+        self.button_stop.setEnabled(False)
 
         self.progress_bar = self.findChild(QtWidgets.QProgressBar, "progressBar")
         self.progress_bar.setRange(0, 100)
@@ -173,6 +176,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.button_fp_plot.clicked.connect(self.create_fp_plot)
 
         self.button_iterate.clicked.connect(self.start_iterations)
+        self.button_stop.clicked.connect(self.stop_thread)
         return
     
 
@@ -381,7 +385,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         if self.alert_message_iterations():
             self.button_iterate.setEnabled(False)
-            self.iterations(test = False)
+            self.start_thread()
         
         return
     
@@ -535,6 +539,29 @@ class MainWindow(QtWidgets.QMainWindow):
         return string_time
 
 
+    def start_thread(self):
+        self.worker_thread = WorkerThread(self)
+        self.worker_thread.finished.connect(self.finish_iterations)
+        self.worker_thread.start()
+
+        self.button_iterate.setEnabled(False)
+        self.button_stop.setEnabled(True)
+        return
+    
+
+    def stop_thread(self):
+        if self.worker_thread and self.worker_thread.isRunning():
+            self.worker_thread.stop()
+            self.worker_thread.wait()
+            self.finish_iterations()
+        return
+    
+
+    def update_progress(self, value):
+        self.progress_bar.setValue(value = value)
+        return
+    
+
     def iterations(self, test: bool = False):
         """
         Proceso de iteraciones para el análisis de sensibilidad.
@@ -552,10 +579,10 @@ class MainWindow(QtWidgets.QMainWindow):
         
         combinations = self.create_combinations(parameters_ranges)
 
-        total_files, total_folder_size = self.iterations_result_files()
+        self.total_files, total_folder_size = self.iterations_result_files()
         total_folder_size *= (1024*1024)
         aprox_file_size = 1200
-        iteration_number = 0
+        self.iteration_number = 0
         
         saved_data = {
                 "x": self.loaded_dataframe[self.x_coordinate],
@@ -568,7 +595,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for price, m_cost, p_cost, discount, recov, sell_c in combinations:
             t1 = time()
-            iteration_number += 1
+            self.iteration_number += 1
             
             df_saved = pd.DataFrame(saved_data)
             volume = 1000
@@ -601,9 +628,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self.save_file(df_saved, file_name, normal = True)
 
-            QCoreApplication.processEvents()
-            progress_index = int((iteration_number/total_files)*100)
-            self.progress_bar.setValue(progress_index)
+            self.update_gui()
         
         self.progress_bar.setValue(100)
         self.finish_iterations()
@@ -885,7 +910,14 @@ class MainWindow(QtWidgets.QMainWindow):
             file_path = os.path.join(path, name)
             df.to_csv(file_path, index = False)
             return
-    
+
+
+    def update_gui(self):
+        QCoreApplication.processEvents()
+        progress_index = int((self.iteration_number/self.total_files)*100)
+        self.progress_bar.setValue(progress_index)
+        return
+
 
     def finish_iterations(self):
         """
@@ -897,8 +929,10 @@ class MainWindow(QtWidgets.QMainWindow):
             "Se han completado las iteraciones",
             QMessageBox.StandardButton.Ok
         )
-        self.button_iterate.setEnabled(True)
         self.progress_bar.setValue(0)
+
+        self.button_iterate.setEnabled(True)
+        self.button_stop.setEnabled(False)
         return
 
 
@@ -907,4 +941,4 @@ class MainWindow(QtWidgets.QMainWindow):
         Esta función cierra la aplicación´.
         """
         self.close()
-        return
+        return        
