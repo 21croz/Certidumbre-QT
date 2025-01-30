@@ -1,6 +1,8 @@
 import pandas as pd                                                                         # Paquete de ayuda para cargar y leer archivos .csv.
 import numpy as np                                                                          # Paquete de ayuda para operaciones matemáticas.
 import os                                                                                   # Paquete para inspeccionar archivos en distintos directorios.
+import threading
+import time
 
 from PyQt6 import QtWidgets, uic, QtGui                                                     # Paquetes parte de PyQt6 que ayudan a facilitar la ejecución del código.
 from PyQt6.QtWidgets import QFileDialog, QMessageBox, QGraphicsScene                        # Paquetes parte de PyQt6 > QtWidgets que facilitan la sintaxis del código.
@@ -9,11 +11,9 @@ from PyQt6.QtCore import QThread, pyqtSignal                                    
 from matplotlib.figure import Figure                                                        # Permite hacer gráficos.
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas            # Permite poner en la interfaz los gráficos creados.
 from itertools import product                                                               # Paquete parte de itertools. Permite hacer combinaciones entre los elementos de una lista.
-from time import time                                                                       # Permite calcular el tiempo de ejecución de ciertas líneas de código.
 
 from view.fp_window import FootprintWindow                                                  # Importe de la clase de la ventana ubicada en, View / Footprint Window.
-from view.iteration_thread import WorkerThread                                              # Importe de la clase del hilo para hacer las iteraciones.
-
+from view.iteration_thread import WorkerThread
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -67,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Esta función define el comportamiento del botón 'guardar' al cerrar la ventana.
         """
-        path = r"reports"
+        path = "reports"
         file_name = "saved_data.txt"
 
         entries = [
@@ -93,7 +93,12 @@ class MainWindow(QtWidgets.QMainWindow):
         
             self.entry_scost_min.text(),
             self.entry_scost_max.text(),
-            self.entry_scost_step.text()]
+            self.entry_scost_step.text(),
+            
+            True if self.check_diluc.isChecked() else False,
+            self.entry_diluc_min.text(),
+            self.entry_diluc_max.text(),
+            self.entry_diluc_step.text()]
 
         with open(os.path.join(path, file_name), "w", encoding = "utf-8") as archivo:
             for i, item in enumerate(entries):
@@ -151,6 +156,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.entry_scost_max = self.findChild(QtWidgets.QLineEdit, "entry_scost_max")
         self.entry_scost_step = self.findChild(QtWidgets.QLineEdit, "entry_scost_step")
 
+        self.check_diluc = self.findChild(QtWidgets.QCheckBox, "check_diluc")
+
+        self.entry_diluc_min = self.findChild(QtWidgets.QLineEdit, "entry_diluc_min")
+        self.entry_diluc_max = self.findChild(QtWidgets.QLineEdit, "entry_diluc_max")
+        self.entry_diluc_step = self.findChild(QtWidgets.QLineEdit, "entry_diluc_step")
+
         self.button_3d_plot = self.findChild(QtWidgets.QPushButton, "button_3d_plot")
         self.button_fp_plot = self.findChild(QtWidgets.QPushButton, "button_foot_plot")
 
@@ -176,7 +187,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.button_fp_plot.clicked.connect(self.create_fp_plot)
 
         self.button_iterate.clicked.connect(self.start_iterations)
-        self.button_stop.clicked.connect(self.stop_thread)
+        # self.button_stop.clicked.connect()
+
+        self.check_diluc.stateChanged.connect(self.check_dilucion)
         return
     
 
@@ -259,37 +272,86 @@ class MainWindow(QtWidgets.QMainWindow):
             self.entry_scost_min,
             self.entry_scost_max,
             self.entry_scost_step,
+            self.check_diluc,
+            self.entry_diluc_min,
+            self.entry_diluc_max,
+            self.entry_diluc_step
         ]
-        
+        empty = ["", "\n"]
+        widget_id = []
+        widget_text = []
+
         with open(os.path.join("reports", "saved_data.txt"), "r") as archivo:
             for line in archivo:
-                save_line = self.split_string(line)
+                splited_line = line.split(", ")
 
-                if save_line != None:
-                    list_line_edits[int(save_line[0])].setText(str(save_line[1]))
+                if line in empty:
+                    break
                 else:
-                    continue
+                    if splited_line[1] not in empty:
+                        try:
+                            widget_id.append(int(splited_line[0]))
+                            widget_text.append(int(splited_line[1]))
+                        except ValueError:
+                            try:
+                                widget_text.append(float(splited_line[1]))
+                            except ValueError:
+                                widget_text.append(splited_line[1])
+        
+
+        for i, text in zip(widget_id, widget_text):
+                text = self.str_to_bool(str(text))
+
+                if not isinstance(text, bool):
+                    list_line_edits[i].setText(text)
+                else:
+                    list_line_edits[i].setChecked(text)
 
         return
 
 
-    def split_string(self, text: str, delim = ","):
+    def check_dilucion(self, estado):
         """
+        Esta funcion desactiva los entries al desactivar el checkbox de la dilución.
         """
-        string1 = ""
-        string2 = ""
-        
-        for i, a in enumerate(text):
-            if a == delim:
-                string1 = text[0:i]
-                string2 = text[i+2:len(text)]
+        if estado == 0:
+            self.entry_diluc_min.setEnabled(False)
+            self.entry_diluc_max.setEnabled(False)
+            self.entry_diluc_step.setEnabled(False)
+        else:
+            self.entry_diluc_min.setEnabled(True)
+            self.entry_diluc_max.setEnabled(True)
+            self.entry_diluc_step.setEnabled(True)
+        return
 
-        try:
-            string1 = float(string1)
-            string2 = float(string2)
-            return string1, string2
-        except Exception:
-            return
+
+    def str_to_bool(self, text: str):
+        """
+        Esta función convierte un string en un bool (True o False).
+
+        Input:
+        * text: String que se quiere convertir
+
+        Output:
+        * True|False
+
+        Ejemplo de uso
+        >>> self.str_to_bool('false')
+        False
+        >>> self.str_to_bool('True')
+        True
+        >>> self.str_to_bool('Hola Mundo')
+        'Hola Mundo'
+        """
+        true_list = [1, 'true', 'True', 'True\n']
+        false_list = [0, 'false', 'False', 'False\n']
+
+        if text in true_list:
+            return True
+        elif text in false_list:
+            return False
+        else:
+            return text
 
 
     def delete_plot(self):
@@ -385,8 +447,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         if self.alert_message_iterations():
             self.button_iterate.setEnabled(False)
-            self.start_thread()
-        
+            self.iterations(test = False)
         return
     
 
@@ -394,6 +455,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Esta función muestra una alerta a la hora de crear las iteraciones, ya que es un proceso que puede
         demorar mucho y generar muchos Gb en archivos.
+
+        Retorna True o False.
         """
         file_number, file_size = self.iterations_result_files()
         self.number_of_files = file_number
@@ -437,10 +500,39 @@ class MainWindow(QtWidgets.QMainWindow):
         for elem in self.list_entries:
             elements_in_range.append(self.define_list(elem[0], elem[1], elem[2]))
         
-        total_length = len(elements_in_range[0])*len(elements_in_range[1])*len(elements_in_range[2])*len(elements_in_range[3])*len(elements_in_range[4])*len(elements_in_range[5])
+        if self.check_diluc.isChecked():
+            total_length = self.list_prod(
+                [
+                    len(elements_in_range[0]),
+                    len(elements_in_range[1]),
+                    len(elements_in_range[2]),
+                    len(elements_in_range[3]),
+                    len(elements_in_range[4]),
+                    len(elements_in_range[5]),
+                    len(elements_in_range[6])
+                ]
+            )
+        else:
+            total_length = self.list_prod(
+                [
+                    len(elements_in_range[0]),
+                    len(elements_in_range[1]),
+                    len(elements_in_range[2]),
+                    len(elements_in_range[3]),
+                    len(elements_in_range[4]),
+                    len(elements_in_range[5])
+                ]
+            )
 
         return total_length, ((total_length + 5)*1200/1024)/1024
-    
+
+
+    def list_prod(self, lst):
+        prod = 1
+        for item in lst:
+            prod *= item
+        return prod
+
 
     def define_list(self, min:int|float, max:int|float, step:int|float):
         """
@@ -478,6 +570,8 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Agrega las entradas a una lista para su posterior uso.
         """
+        self.list_entries = []
+
         self.list_entries.append([])
         self.list_entries[0].append(float(self.entry_price_min.text()))
         self.list_entries[0].append(float(self.entry_price_max.text()))
@@ -507,6 +601,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_entries[5].append(float(self.entry_scost_min.text()))
         self.list_entries[5].append(float(self.entry_scost_max.text()))
         self.list_entries[5].append(float(self.entry_scost_step.text()))
+
+        # Si se quiere hacer el cálculo con la dilución, se agregan las variables al algoritmo.
+        if self.check_diluc.isChecked():
+            self.list_entries.append([])
+            self.list_entries[6].append(float(self.entry_diluc_min.text()))
+            self.list_entries[6].append(float(self.entry_diluc_max.text()))
+            self.list_entries[6].append(float(self.entry_diluc_step.text()))
+
         return
     
 
@@ -537,24 +639,6 @@ class MainWindow(QtWidgets.QMainWindow):
         string_time = f'{string_time_days}d {string_time_hours}h {string_time_minutes}m {string_time_seconds}s'
 
         return string_time
-
-
-    def start_thread(self):
-        self.worker_thread = WorkerThread(self)
-        self.worker_thread.finished.connect(self.finish_iterations)
-        self.worker_thread.start()
-
-        self.button_iterate.setEnabled(False)
-        self.button_stop.setEnabled(True)
-        return
-    
-
-    def stop_thread(self):
-        if self.worker_thread and self.worker_thread.isRunning():
-            self.worker_thread.stop()
-            self.worker_thread.wait()
-            self.finish_iterations()
-        return
     
 
     def update_progress(self, value):
@@ -569,7 +653,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.verify_folder()
         self.save_combobox()
 
-        parameters_ranges = [
+        self.parameters_ranges = [
             self.define_list(self.list_entries[0][0], self.list_entries[0][1], self.list_entries[0][2]),
             self.define_list(self.list_entries[1][0], self.list_entries[1][1], self.list_entries[1][2]),
             self.define_list(self.list_entries[2][0], self.list_entries[2][1], self.list_entries[2][2]),
@@ -577,7 +661,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.define_list(self.list_entries[4][0], self.list_entries[4][1], self.list_entries[4][2]),
             self.define_list(self.list_entries[5][0], self.list_entries[5][1], self.list_entries[5][2])]
         
-        combinations = self.create_combinations(parameters_ranges)
+        if self.check_diluc.isChecked():
+            self.parameters_ranges.append(self.define_list(self.list_entries[6][0], self.list_entries[6][1], self.list_entries[6][2]))
+        else:
+            self.parameters_ranges.append([0])
+
+        self.combinations = self.create_combinations(self.parameters_ranges)
 
         self.total_files, total_folder_size = self.iterations_result_files()
         total_folder_size *= (1024*1024)
@@ -593,8 +682,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 "antes_max": self.loaded_dataframe["antes_max"]
             }
 
-        for price, m_cost, p_cost, discount, recov, sell_c in combinations:
-            t1 = time()
+        for price, m_cost, p_cost, discount, recov, sell_c, dilut in self.combinations:
+
+            t1 = time.time()
             self.iteration_number += 1
             
             df_saved = pd.DataFrame(saved_data)
@@ -609,14 +699,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 grade = df_saved["grade"],
                 mine_cost = m_cost,
                 plant_cost = p_cost,
-                dilution = 0
+                dilution = dilut
             )
             df_saved["disc_value"] = df_saved["value"]/((1 + discount/100) ** df_saved["period"])
             df_saved = self.set_antes_max(df_saved)
 
-            file_name = f'p{round(price, 1)}mc{round(m_cost, 1)}pc{round(p_cost, 1)}d{round(discount, 1)}r{round(recov, 1)}sc{round(sell_c, 1)}.csv'
+            file_name = f'p{round(price, 1)}mc{round(m_cost, 1)}pc{round(p_cost, 1)}d{round(discount, 1)}r{round(recov, 1)}sc{round(sell_c, 1)}dil{round(dilut, 1)}.csv'
 
-            case = self.set_study_case(parameters_ranges, price, m_cost, p_cost, discount, recov, sell_c)
+            case = self.set_study_case(self.parameters_ranges, price, m_cost, p_cost, discount, recov, sell_c, dilut)
 
             if case != '':
                 self.save_file(df_saved, f"{case}.csv", normal = False)
@@ -624,9 +714,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
             if test == True:
                 self.save_file(df_saved, "test.csv", test = True)
-                return time() - t1
+                return time.time() - t1
             
-            self.save_file(df_saved, file_name, normal = True)
+            # COMENTAR SIGUIENTE LINEA PARA NO GENERAR TODOS LOS ARCHIVOS
+            # self.save_file(df_saved, file_name, normal = True)
 
             self.update_gui()
         
@@ -721,7 +812,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return income - outcome
     
 
-    def set_study_case(self, parameters_range:list, price:float, mine_cost:float, plant_cost:float, discount:int, recovery:int, sell_cost:float):
+    def set_study_case(self, parameters_range:list, price:float, mine_cost:float, plant_cost:float, discount:int, recovery:int, sell_cost:float, dilution: int):
         """
         Esta funcion ayuda a seleccionar la iteración con la que se está trabajando, si corresponde al Best Case, Worst Case, o casos intermedios
         
@@ -739,38 +830,45 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         # Lista con parámetros actuales
         list_scenario = [price, mine_cost, plant_cost,
-                         discount, recovery, sell_cost]
+                         discount, recovery, sell_cost, dilution]
         
         # Recuperar minimos y máximos
-        min_price, max_price = parameters_range[0][0], parameters_range[0][-1]
-        min_mine_cost, max_mine_cost = parameters_range[1][0], parameters_range[1][-1]
-        min_plant_cost, max_plant_cost = parameters_range[2][0], parameters_range[2][-1]
-        min_discount, max_discount = parameters_range[3][0], parameters_range[3][-1]
-        min_recovery, max_recovery = parameters_range[4][0], parameters_range[4][-1]
-        min_sell_cost, max_sell_cost = parameters_range[5][0], parameters_range[5][-1]
+        min_price,      max_price =         parameters_range[0][0], parameters_range[0][-1]
+        min_mine_cost,  max_mine_cost =     parameters_range[1][0], parameters_range[1][-1]
+        min_plant_cost, max_plant_cost =    parameters_range[2][0], parameters_range[2][-1]
+        min_discount,   max_discount =      parameters_range[3][0], parameters_range[3][-1]
+        min_recovery,   max_recovery =      parameters_range[4][0], parameters_range[4][-1]
+        min_sell_cost,  max_sell_cost =     parameters_range[5][0], parameters_range[5][-1]
 
         # Recuperar casos intermedios
-        price_25, price_50, price_75 = self.list_percentage(parameters_range[0], (25, 50, 75))
-        mine_cost_25, mine_cost_50, mine_cost_75 = self.list_percentage(parameters_range[1], (25, 50, 75))
-        plant_cost_25, plant_cost_50, plant_cost_75 = self.list_percentage(parameters_range[2], (25, 50, 75))
-        discount_25, discount_50, discount_75 = self.list_percentage(parameters_range[3], (25, 50, 75))
-        recovery_25, recovery_50, recovery_75 = self.list_percentage(parameters_range[4], (25, 50, 75))
-        sell_cost_25, sell_cost_50, sell_cost_75 = self.list_percentage(parameters_range[5], (25, 50, 75))
+        price_25,       price_50,       price_75 =      self.list_percentage(parameters_range[0], (25, 50, 75))
+        mine_cost_25,   mine_cost_50,   mine_cost_75 =  self.list_percentage(parameters_range[1], (25, 50, 75))
+        plant_cost_25,  plant_cost_50,  plant_cost_75 = self.list_percentage(parameters_range[2], (25, 50, 75))
+        discount_25,    discount_50,    discount_75 =   self.list_percentage(parameters_range[3], (25, 50, 75))
+        recovery_25,    recovery_50,    recovery_75 =   self.list_percentage(parameters_range[4], (25, 50, 75))
+        sell_cost_25,   sell_cost_50,   sell_cost_75 =  self.list_percentage(parameters_range[5], (25, 50, 75))
+
+        if self.check_diluc.isChecked():
+            min_dilution, max_dilution = parameters_range[6][0], parameters_range[6][-1]
+            dilution_25, dilution_50, dilution_75 = self.list_percentage(parameters_range[6], (25, 50, 75))
+        else:
+            min_dilution = max_dilution = 0
+            dilution_25 = dilution_50 = dilution_75 = 0
 
         list_best = [max_price, min_mine_cost, min_plant_cost,
-                    min_discount, max_recovery, min_sell_cost]
+                    min_discount, max_recovery, min_sell_cost, min_dilution]
         
         list_worst = [min_price, max_mine_cost, max_plant_cost,
-                      max_discount, min_recovery, max_sell_cost]
+                      max_discount, min_recovery, max_sell_cost, max_dilution]
         
         list_midcase_25 = [price_25, mine_cost_75, plant_cost_75,
-                           discount_75, recovery_25, sell_cost_75]
+                           discount_75, recovery_25, sell_cost_75, dilution_75]
 
         list_midcase_50 = [price_50, mine_cost_50, plant_cost_50,
-                           discount_50, recovery_50, sell_cost_50]
+                           discount_50, recovery_50, sell_cost_50, dilution_50]
 
         list_midcase_75 = [price_75, mine_cost_25, plant_cost_25,
-                           discount_25, recovery_75, sell_cost_25]
+                           discount_25, recovery_75, sell_cost_25, dilution_25]
         
         if list_scenario == list_best:
             return "1 best"
@@ -929,6 +1027,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "Se han completado las iteraciones",
             QMessageBox.StandardButton.Ok
         )
+        
         self.progress_bar.setValue(0)
 
         self.button_iterate.setEnabled(True)
