@@ -375,11 +375,11 @@ QLabel {
 }</string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
-     <string>Tab 1</string>
+     <string>Gráfico</string>
     </attribute>
     <widget class="QFrame" name="frame_2">
      <property name="geometry">
@@ -422,7 +422,7 @@ QLabel {
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
-     <string>Tab 2</string>
+     <string>Estadística</string>
     </attribute>
     <widget class="QFrame" name="frame_4">
      <property name="geometry">
