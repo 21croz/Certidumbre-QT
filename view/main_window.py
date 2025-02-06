@@ -445,9 +445,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Esta función inicia el proceso de las iteraciones.
         """
-        if self.alert_message_iterations():
+        respuesta_iterations = self.alert_message_iterations()
+        
+        if respuesta_iterations == 1:
             self.button_iterate.setEnabled(False)
             self.iterations(test = False)
+        elif respuesta_iterations == 2:
+            self.button_iterate.setEnabled(False)
+            self.iterations_study_cases()
         return
     
 
@@ -475,17 +480,24 @@ class MainWindow(QtWidgets.QMainWindow):
         mensaje = QMessageBox(self)
         mensaje.setWindowTitle("Confirmación")
         mensaje.setText(
-            "¿Estás seguro?\n"
-            f"Se crearán {string_file_number} archivos.\n"
-            f"El peso total será {string_files_size} aproximadamente.\n"
+            f"¿Quieres generar todas las iteraciones?\n"
+            f"({string_file_number} archivos | {string_files_size})\n"
             f"Demorará aproximadamente {iterate_time}")
         mensaje.setIcon(QMessageBox.Icon.Warning)
-        mensaje.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+        mensaje.setStandardButtons(
+            QMessageBox.StandardButton.Ok |
+            QMessageBox.StandardButton.No |
+            QMessageBox.StandardButton.Cancel)
         
         respuesta = mensaje.exec()
 
-        return respuesta == QMessageBox.StandardButton.Ok
-    
+        if respuesta == QMessageBox.StandardButton.Ok:
+            return 1
+        if respuesta == QMessageBox.StandardButton.No:
+            return 2
+        if respuesta == QMessageBox.StandardButton.Cancel:
+            return 0  
+
 
     def iterations_result_files(self):
         """
@@ -716,11 +728,86 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.save_file(df_saved, "test.csv", test = True)
                 return time.time() - t1
             
-            # COMENTAR SIGUIENTE LINEA PARA NO GENERAR TODOS LOS ARCHIVOS
-            # self.save_file(df_saved, file_name, normal = True)
+            self.save_file(df_saved, file_name, normal = True)
 
             self.update_gui()
         
+        self.progress_bar.setValue(100)
+        self.finish_iterations()
+        return
+    
+
+    def iterations_study_cases(self):
+        """
+        Proceso de iteraciones para el análisis de sensibilidad.
+        """
+        self.verify_folder()
+        self.save_combobox()
+
+        self.total_files = 5
+        self.parameters_ranges = [
+            self.define_list(self.list_entries[0][0], self.list_entries[0][1], self.list_entries[0][2]),
+            self.define_list(self.list_entries[1][0], self.list_entries[1][1], self.list_entries[1][2]),
+            self.define_list(self.list_entries[2][0], self.list_entries[2][1], self.list_entries[2][2]),
+            self.define_list(self.list_entries[3][0], self.list_entries[3][1], self.list_entries[3][2]),
+            self.define_list(self.list_entries[4][0], self.list_entries[4][1], self.list_entries[4][2]),
+            self.define_list(self.list_entries[5][0], self.list_entries[5][1], self.list_entries[5][2])]
+        file_names = [
+            '1 best.csv',
+            '2 mid75.csv',
+            '3 mid50.csv',
+            '4 mid25.csv',
+            '5 worst.csv'
+        ]
+
+        if self.check_diluc.isChecked():
+            self.parameters_ranges.append(self.define_list(self.list_entries[6][0], self.list_entries[6][1], self.list_entries[6][2]))
+        else:
+            self.parameters_ranges.append([0])
+        
+        saved_data = {
+                "x": self.loaded_dataframe[self.x_coordinate],
+                "y": self.loaded_dataframe[self.y_coordinate],
+                "z": self.loaded_dataframe[self.z_coordinate],
+                "grade": self.loaded_dataframe[self.metal_grade],
+                "period": self.loaded_dataframe["Period"],
+                "antes_max": self.loaded_dataframe["antes_max"]
+            }
+        iterations_values = []
+
+        for item in self.parameters_ranges:
+            iterations_values.append(self.list_percentage(item, (0, 25, 50, 75, 100)))
+        
+        iterations_params = [
+            [iterations_values[0][4], iterations_values[1][0], iterations_values[2][0], iterations_values[3][0], iterations_values[4][4], iterations_values[5][0], iterations_values[6][0]],
+            [iterations_values[0][3], iterations_values[1][1], iterations_values[2][1], iterations_values[3][1], iterations_values[4][3], iterations_values[5][1], iterations_values[6][1]],
+            [iterations_values[0][2], iterations_values[1][2], iterations_values[2][2], iterations_values[3][2], iterations_values[4][2], iterations_values[5][2], iterations_values[6][2]],
+            [iterations_values[0][1], iterations_values[1][3], iterations_values[2][3], iterations_values[3][3], iterations_values[4][1], iterations_values[5][3], iterations_values[6][3]],
+            [iterations_values[0][0], iterations_values[1][4], iterations_values[2][4], iterations_values[3][4], iterations_values[4][0], iterations_values[5][4], iterations_values[6][4]]
+        ]
+
+        self.iteration_number = 0
+        for it in iterations_params:
+            df_saved = pd.DataFrame(saved_data)
+            volume = 1000
+            df_saved['value'] = self.calculate_block_value(
+                price = it[0],
+                sell_cost = it[5],
+                volume = volume,
+                density = 2.7,
+                recovery = it[4],
+                grade = df_saved['grade'],
+                mine_cost = it[1],
+                plant_cost = it[2],
+                dilution = it[6]
+            )
+            df_saved["disc_value"] = df_saved["value"]/((1 + it[3]/100) ** df_saved["period"])
+            df_saved = self.set_antes_max(df_saved)
+
+            self.save_file(df_saved, file_names[self.iteration_number], normal = False)
+            
+            self.iteration_number += 1
+
         self.progress_bar.setValue(100)
         self.finish_iterations()
         return

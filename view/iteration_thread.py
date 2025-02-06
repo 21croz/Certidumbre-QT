@@ -27,9 +27,8 @@ class WorkerThread(QThread):
         """
         Constructor de la clase del hilo.
         """
-        super().__init__(parent)
         self.main_window = parent
-        self.stopped = False
+        self.activo = True
 
         
     def run(self):
